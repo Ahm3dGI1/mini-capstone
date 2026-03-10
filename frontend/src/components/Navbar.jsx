@@ -12,31 +12,33 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <nav className="bg-navy-900 sticky top-0 z-50 shadow-lg shadow-navy-950/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
-          <Link to={user ? '/dashboard' : '/'} className="flex items-center gap-2 text-xl font-bold text-primary-600 hover:text-primary-700 transition">
-            <FiBookOpen className="text-2xl" />
-            LearnTube
+          <Link to={user ? '/dashboard' : '/'} className="flex items-center gap-2.5 group">
+            <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center group-hover:bg-primary-400 transition">
+              <FiBookOpen className="text-white text-lg" />
+            </div>
+            <span className="text-lg font-bold text-white tracking-tight">Hermex</span>
           </Link>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1">
             {user ? (
               <>
-                <Link to="/dashboard" className="flex items-center gap-1 text-gray-600 hover:text-primary-600 transition text-sm font-medium">
-                  <FiGrid /> Dashboard
+                <Link to="/dashboard" className="flex items-center gap-1.5 text-stone-300 hover:text-primary-400 hover:bg-white/5 transition px-3 py-2 rounded-lg text-sm font-medium">
+                  <FiGrid className="text-base" /> Dashboard
                 </Link>
-                <Link to="/profile" className="flex items-center gap-1 text-gray-600 hover:text-primary-600 transition text-sm font-medium">
-                  <FiUser /> {user.name}
+                <Link to="/profile" className="flex items-center gap-1.5 text-stone-300 hover:text-primary-400 hover:bg-white/5 transition px-3 py-2 rounded-lg text-sm font-medium">
+                  <FiUser className="text-base" /> {user.name}
                 </Link>
-                <button onClick={handleLogout} className="flex items-center gap-1 text-gray-500 hover:text-red-600 transition text-sm font-medium">
-                  <FiLogOut /> Logout
+                <button onClick={handleLogout} className="flex items-center gap-1.5 text-stone-400 hover:text-red-400 hover:bg-white/5 transition px-3 py-2 rounded-lg text-sm font-medium ml-1">
+                  <FiLogOut className="text-base" />
                 </button>
               </>
             ) : (
               <>
-                <Link to="/login" className="text-gray-600 hover:text-primary-600 transition text-sm font-medium">Log In</Link>
-                <Link to="/register" className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition text-sm font-medium">Sign Up</Link>
+                <Link to="/login" className="text-stone-300 hover:text-white transition text-sm font-medium px-3 py-2 rounded-lg hover:bg-white/5">Log In</Link>
+                <Link to="/register" className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-500 transition text-sm font-semibold ml-1">Sign Up</Link>
               </>
             )}
           </div>

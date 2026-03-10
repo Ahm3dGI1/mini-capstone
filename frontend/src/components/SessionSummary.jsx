@@ -14,24 +14,24 @@ export default function SessionSummary({ checkpoints, onAskTutor }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 max-w-md mx-auto">
+    <div className="bg-white rounded-xl border border-surface-200 p-6 max-w-md mx-auto animate-fade-up">
       {/* Score */}
       <div className="text-center mb-6">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary-50 mb-3">
-          <FiAward className={`text-3xl ${score >= 70 ? 'text-green-600' : score >= 40 ? 'text-yellow-600' : 'text-red-600'}`} />
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-surface-100 mb-4">
+          <FiAward className={`text-2xl ${score >= 70 ? 'text-emerald-600' : score >= 40 ? 'text-accent-600' : 'text-red-500'}`} />
         </div>
-        <h2 className="text-2xl font-bold text-gray-900">Session Complete!</h2>
-        <p className="text-4xl font-bold mt-2">
-          <span className={score >= 70 ? 'text-green-600' : score >= 40 ? 'text-yellow-600' : 'text-red-600'}>{correct.length}</span>
-          <span className="text-gray-400 text-2xl"> / {checkpoints.length}</span>
+        <h2 className="text-xl font-bold text-surface-900">Session Complete!</h2>
+        <p className="text-4xl font-extrabold mt-3">
+          <span className={score >= 70 ? 'text-emerald-600' : score >= 40 ? 'text-accent-600' : 'text-red-500'}>{correct.length}</span>
+          <span className="text-surface-300 text-2xl font-bold"> / {checkpoints.length}</span>
         </p>
-        <p className="text-gray-500 text-sm mt-1">checkpoints correct ({score}%)</p>
+        <p className="text-surface-500 text-sm mt-1">checkpoints correct ({score}%)</p>
       </div>
 
       {/* Breakdown */}
       <div className="space-y-2 mb-6">
         {correct.length > 0 && (
-          <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 px-3 py-2 rounded-lg">
+          <div className="flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 px-3 py-2 rounded-lg">
             <FiCheck /> {correct.length} correct
           </div>
         )}
@@ -44,7 +44,7 @@ export default function SessionSummary({ checkpoints, onAskTutor }) {
           </div>
         )}
         {skipped.length > 0 && (
-          <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
+          <div className="flex items-center gap-2 text-sm text-surface-600 bg-surface-100 px-3 py-2 rounded-lg">
             {skipped.length} skipped
           </div>
         )}
@@ -54,7 +54,7 @@ export default function SessionSummary({ checkpoints, onAskTutor }) {
       {onAskTutor && (
         <button
           onClick={onAskTutor}
-          className="w-full flex items-center justify-center gap-2 bg-primary-600 text-white py-3 rounded-xl font-semibold hover:bg-primary-700 transition"
+          className="w-full flex items-center justify-center gap-2 bg-primary-700 text-white py-3 rounded-lg font-semibold hover:bg-primary-600 transition-all shadow-sm"
         >
           <FiMessageCircle /> Ask the Tutor Questions
         </button>

@@ -93,8 +93,8 @@ export default function SessionPage() {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <p className="text-gray-500">Loading session...</p>
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary-200 border-t-primary-600 mx-auto mb-4"></div>
+          <p className="text-surface-500 text-sm">Loading session...</p>
         </div>
       </div>
     );
@@ -103,20 +103,20 @@ export default function SessionPage() {
   if (!session) return null;
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-gray-50">
+    <div className="min-h-[calc(100vh-64px)] bg-surface-50">
       {/* Top bar */}
-      <div className="bg-white border-b border-gray-100 px-4 py-2">
+      <div className="bg-white border-b border-surface-200 px-4 py-2.5">
         <div className="max-w-[1600px] mx-auto flex items-center justify-between">
           <button
             onClick={() => navigate('/dashboard')}
-            className="flex items-center gap-1 text-gray-500 hover:text-primary-600 transition text-sm"
+            className="flex items-center gap-1.5 text-surface-500 hover:text-primary-700 transition text-sm font-medium"
           >
             <FiArrowLeft /> Dashboard
           </button>
-          <h1 className="text-sm font-medium text-gray-700 truncate max-w-md">{session.video_title}</h1>
+          <h1 className="text-sm font-medium text-surface-700 truncate max-w-md">{session.video_title}</h1>
           <button
             onClick={() => setShowChat(!showChat)}
-            className="lg:hidden flex items-center gap-1 text-gray-500 hover:text-primary-600 transition text-sm"
+            className="lg:hidden flex items-center gap-1.5 text-surface-500 hover:text-primary-700 transition text-sm"
           >
             <FiMessageCircle /> Chat
           </button>
@@ -155,10 +155,11 @@ export default function SessionPage() {
             />
 
             {/* Video Info */}
-            <div className="mt-3 px-1">
-              <h2 className="text-lg font-semibold text-gray-900">{session.video_title}</h2>
-              <div className="flex items-center gap-4 mt-1 text-xs text-gray-400">
+            <div className="mt-4 px-1">
+              <h2 className="text-base font-semibold text-surface-800">{session.video_title}</h2>
+              <div className="flex items-center gap-4 mt-1.5 text-xs text-surface-400">
                 <span>{checkpoints.length} checkpoints</span>
+                <span className="w-1 h-1 bg-surface-300 rounded-full"></span>
                 <span>
                   {checkpoints.filter((c) => c.user_answer !== null).length} / {checkpoints.length} answered
                 </span>
@@ -196,7 +197,7 @@ export default function SessionPage() {
       {!showChat && (
         <button
           onClick={handleChatOpen}
-          className="lg:hidden fixed bottom-6 right-6 bg-primary-600 text-white p-4 rounded-full shadow-xl hover:bg-primary-700 transition z-40"
+          className="lg:hidden fixed bottom-6 right-6 bg-primary-700 text-white p-4 rounded-full shadow-xl shadow-primary-700/30 hover:bg-primary-600 transition z-40"
         >
           <FiMessageCircle className="text-xl" />
         </button>

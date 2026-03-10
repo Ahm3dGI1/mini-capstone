@@ -59,25 +59,25 @@ export default function DashboardPage() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
       {/* New Session */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Start a New Session</h2>
+      <div className="bg-white rounded-xl border border-surface-200 p-6 mb-8">
+        <h2 className="text-base font-semibold text-surface-900 mb-4">Start a New Session</h2>
         <form onSubmit={handleCreate} className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder="Paste a YouTube URL..."
-            className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 text-sm"
+            className="flex-1 px-4 py-3 border border-surface-200 rounded-lg bg-surface-50 focus:bg-white focus:ring-2 focus:ring-primary-200 focus:border-primary-400 text-sm transition"
             disabled={creating}
           />
           <button
             type="submit"
             disabled={!url.trim() || creating}
-            className="bg-primary-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
+            className="bg-accent-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-accent-600 transition-all disabled:opacity-40 flex items-center justify-center gap-2 shadow-sm shadow-accent-500/20"
           >
             {creating ? (
               <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white"></div>
                 Processing...
               </>
             ) : (
@@ -88,33 +88,38 @@ export default function DashboardPage() {
           </button>
         </form>
         {creating && (
-          <p className="text-gray-400 text-xs mt-2">Fetching transcript and generating quizzes... this may take 15-30 seconds.</p>
+          <p className="text-surface-400 text-xs mt-3">Fetching transcript and generating quizzes... this may take 15-30 seconds.</p>
         )}
       </div>
 
       {/* Sessions List */}
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">Your Sessions</h2>
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="text-base font-semibold text-surface-900">Your Sessions</h2>
+        {sessions.length > 0 && (
+          <span className="text-xs text-surface-400 font-medium">{sessions.length} session{sessions.length !== 1 ? 's' : ''}</span>
+        )}
+      </div>
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary-200 border-t-primary-600"></div>
         </div>
       ) : sessions.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
-          <FiVideo className="mx-auto text-4xl mb-3 text-gray-300" />
-          <p className="text-lg">No sessions yet</p>
-          <p className="text-sm">Paste a YouTube URL above to get started!</p>
+        <div className="text-center py-20 text-surface-400">
+          <FiVideo className="mx-auto text-4xl mb-3 text-surface-300" />
+          <p className="text-lg font-medium text-surface-500">No sessions yet</p>
+          <p className="text-sm mt-1">Paste a YouTube URL above to get started!</p>
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {sessions.map((session) => (
             <div
               key={session.id}
-              className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition overflow-hidden group"
+              className="bg-white rounded-xl border border-surface-200 overflow-hidden group card-hover"
             >
               {/* Thumbnail */}
               <div
-                className="relative h-36 bg-gray-100 cursor-pointer"
+                className="relative h-36 bg-surface-100 cursor-pointer"
                 onClick={() => navigate(`/session/${session.id}`)}
               >
                 <img
@@ -122,15 +127,17 @@ export default function DashboardPage() {
                   alt={session.video_title}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition flex items-center justify-center">
-                  <FiPlay className="text-white text-2xl opacity-0 group-hover:opacity-100 transition" />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center">
+                  <div className="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100">
+                    <FiPlay className="text-surface-800 text-sm ml-0.5" />
+                  </div>
                 </div>
               </div>
 
               {/* Info */}
               <div className="p-4">
                 <h3
-                  className="font-semibold text-sm text-gray-900 truncate cursor-pointer hover:text-primary-600 transition"
+                  className="font-semibold text-sm text-surface-800 truncate cursor-pointer hover:text-primary-700 transition"
                   onClick={() => navigate(`/session/${session.id}`)}
                   title={session.video_title}
                 >
@@ -138,16 +145,16 @@ export default function DashboardPage() {
                 </h3>
 
                 <div className="flex items-center justify-between mt-3">
-                  <div className="flex items-center gap-3 text-xs text-gray-400">
+                  <div className="flex items-center gap-3 text-xs text-surface-400">
                     <span className="flex items-center gap-1"><FiClock /> {formatDate(session.created_at)}</span>
                     <span className="flex items-center gap-1">
-                      <FiCheckCircle className={session.score.correct > 0 ? 'text-green-500' : ''} />
+                      <FiCheckCircle className={session.score.correct > 0 ? 'text-emerald-500' : ''} />
                       {session.score.correct}/{session.score.total}
                     </span>
                   </div>
                   <button
                     onClick={(e) => { e.stopPropagation(); handleDelete(session.id); }}
-                    className="text-gray-300 hover:text-red-500 transition p-1"
+                    className="text-surface-300 hover:text-red-500 transition p-1"
                     title="Delete session"
                   >
                     <FiTrash2 className="text-sm" />

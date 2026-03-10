@@ -51,11 +51,11 @@ export default function TutorChat({ sessionId, chatMessages, setChatMessages, cu
           setIsCollapsed(false);
           if (onChatOpen) onChatOpen();
         }}
-        className="lg:hidden fixed bottom-6 right-6 bg-primary-600 text-white p-4 rounded-full shadow-xl hover:bg-primary-700 transition z-40"
+        className="lg:hidden fixed bottom-6 right-6 bg-primary-700 text-white p-4 rounded-full shadow-xl shadow-primary-700/30 hover:bg-primary-600 transition z-40"
       >
         <FiMessageCircle className="text-xl" />
         {chatMessages.length > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 bg-accent-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
             {chatMessages.filter((m) => m.role === 'assistant').length}
           </span>
         )}
@@ -64,14 +64,14 @@ export default function TutorChat({ sessionId, chatMessages, setChatMessages, cu
   }
 
   return (
-    <div className="flex flex-col h-full bg-white border border-gray-200 rounded-xl shadow-sm">
+    <div className="flex flex-col h-full bg-white border border-surface-200 rounded-xl overflow-hidden">
       {/* Chat Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50 rounded-t-xl">
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-          <h3 className="font-semibold text-sm text-gray-800">AI Tutor</h3>
+      <div className="flex items-center justify-between px-4 py-3 border-b border-surface-100 bg-surface-50">
+        <div className="flex items-center gap-2.5">
+          <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+          <h3 className="font-semibold text-sm text-surface-800">AI Tutor</h3>
         </div>
-        <button onClick={() => setIsCollapsed(true)} className="lg:hidden text-gray-400 hover:text-gray-600">
+        <button onClick={() => setIsCollapsed(true)} className="lg:hidden text-surface-400 hover:text-surface-600 transition">
           <FiX />
         </button>
       </div>
@@ -79,18 +79,20 @@ export default function TutorChat({ sessionId, chatMessages, setChatMessages, cu
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3 chat-scroll">
         {chatMessages.length === 0 && (
-          <div className="text-center text-gray-400 text-sm mt-8">
-            <FiMessageCircle className="mx-auto text-3xl mb-2 text-gray-300" />
-            <p>Ask me anything about the video!</p>
-            <p className="text-xs mt-1">I have full context of the transcript.</p>
+          <div className="text-center text-surface-400 text-sm mt-8">
+            <div className="w-12 h-12 bg-surface-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <FiMessageCircle className="text-2xl text-surface-300" />
+            </div>
+            <p className="font-medium text-surface-500">Ask me anything about the video!</p>
+            <p className="text-xs mt-1 text-surface-400">I have full context of the transcript.</p>
           </div>
         )}
         {chatMessages.map((msg) => (
           <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[85%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+            <div className={`max-w-[85%] px-4 py-2.5 text-sm leading-relaxed ${
               msg.role === 'user'
-                ? 'bg-primary-600 text-white rounded-br-md'
-                : 'bg-gray-100 text-gray-800 rounded-bl-md'
+                ? 'bg-primary-700 text-white rounded-2xl rounded-br-md'
+                : 'bg-surface-100 text-surface-800 rounded-2xl rounded-bl-md'
             }`}>
               {msg.content}
             </div>
@@ -98,11 +100,11 @@ export default function TutorChat({ sessionId, chatMessages, setChatMessages, cu
         ))}
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-gray-100 text-gray-500 px-4 py-2.5 rounded-2xl rounded-bl-md text-sm">
+            <div className="bg-surface-100 text-surface-500 px-4 py-2.5 rounded-2xl rounded-bl-md text-sm">
               <span className="flex gap-1">
-                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                <span className="w-1.5 h-1.5 bg-surface-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                <span className="w-1.5 h-1.5 bg-surface-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                <span className="w-1.5 h-1.5 bg-surface-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
               </span>
             </div>
           </div>
@@ -111,20 +113,20 @@ export default function TutorChat({ sessionId, chatMessages, setChatMessages, cu
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSend} className="p-3 border-t border-gray-100">
+      <form onSubmit={handleSend} className="p-3 border-t border-surface-100">
         <div className="flex gap-2">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask about the video..."
-            className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300"
+            className="flex-1 px-4 py-2.5 border border-surface-200 rounded-lg bg-surface-50 text-sm focus:bg-white focus:ring-2 focus:ring-primary-200 focus:border-primary-400 transition"
             disabled={loading}
           />
           <button
             type="submit"
             disabled={!input.trim() || loading}
-            className="bg-primary-600 text-white p-2.5 rounded-xl hover:bg-primary-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-primary-700 text-white p-2.5 rounded-lg hover:bg-primary-600 transition disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <FiSend />
           </button>
