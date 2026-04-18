@@ -1,11 +1,20 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { getSession, answerCheckpoint } from '../api/api';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import {
+  getSession,
+  answerCheckpoint,
+  generateStudyMaterial,
+  listStudyMaterials,
+  getSessionRecap,
+  generateSessionRecap,
+} from '../api/api';
 import VideoPlayer from '../components/VideoPlayer';
 import CheckpointModal from '../components/CheckpointModal';
 import ProgressBar from '../components/ProgressBar';
 import TutorChat from '../components/TutorChat';
 import SessionSummary from '../components/SessionSummary';
+import StudyMaterialsPanel from '../components/StudyMaterialsPanel';
+import SessionRecapPanel from '../components/SessionRecapPanel';
 import { FiArrowLeft, FiMessageCircle } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
@@ -23,17 +32,44 @@ export default function SessionPage() {
   const [activeCheckpoint, setActiveCheckpoint] = useState(null);
   const [showSummary, setShowSummary] = useState(false);
   const [showChat, setShowChat] = useState(true);
+  const [generatingStudyMaterial, setGeneratingStudyMaterial] = useState(false);
+  const [generatedStudyMaterials, setGeneratedStudyMaterials] = useState([]);
+  const [sessionRecap, setSessionRecap] = useState(null);
+  const [generatingRecap, setGeneratingRecap] = useState(false);
 
   useEffect(() => {
     fetchSession();
   }, [id]);
 
+  useEffect(() => {
+    if (checkpoints.length === 0) {
+      setShowSummary(false);
+      return;
+    }
+
+    const allAnswered = checkpoints.every((cp) => cp.user_answer !== null);
+    if (allAnswered) {
+      setShowSummary(true);
+    }
+  }, [checkpoints]);
+
   const fetchSession = async () => {
     try {
-      const res = await getSession(id);
-      setSession(res.data.session);
-      setCheckpoints(res.data.session.checkpoints || []);
-      setChatMessages(res.data.session.chat_messages || []);
+      const [sessionRes, materialsRes] = await Promise.all([
+        getSession(id),
+        listStudyMaterials(id),
+      ]);
+      setSession(sessionRes.data.session);
+      setCheckpoints(sessionRes.data.session.checkpoints || []);
+      setChatMessages(sessionRes.data.session.chat_messages || []);
+      setGeneratedStudyMaterials(materialsRes.data.materials || []);
+
+      try {
+        const recapRes = await getSessionRecap(id);
+        setSessionRecap(recapRes.data.recap || null);
+      } catch {
+        setSessionRecap(null);
+      }
     } catch (err) {
       toast.error('Session not found');
       navigate('/dashboard');
@@ -89,6 +125,39 @@ export default function SessionPage() {
     playerRef.current?.pause();
   };
 
+  const handleGenerateStudyMaterial = async (materialTypes) => {
+    setGeneratingStudyMaterial(true);
+    try {
+      await generateStudyMaterial(id, materialTypes);
+      const materialsRes = await listStudyMaterials(id);
+      setGeneratedStudyMaterials(materialsRes.data.materials || []);
+      toast.success('Study materials generated');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to generate study material');
+    } finally {
+      setGeneratingStudyMaterial(false);
+    }
+  };
+
+  const handleGenerateRecap = async () => {
+    setGeneratingRecap(true);
+    try {
+      const res = await generateSessionRecap(id);
+      setSessionRecap(res.data.recap || null);
+      toast.success('Session recap generated');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to generate recap');
+    } finally {
+      setGeneratingRecap(false);
+    }
+  };
+
+  const handleSeekToCheckpoint = (checkpoint) => {
+    if (!playerRef.current) return;
+    playerRef.current.seekTo(checkpoint.timestamp_seconds);
+    setCurrentTime(checkpoint.timestamp_seconds);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
@@ -113,13 +182,21 @@ export default function SessionPage() {
           >
             <FiArrowLeft /> Dashboard
           </button>
-          <h1 className="text-sm font-medium text-surface-700 truncate max-w-md">{session.video_title}</h1>
-          <button
-            onClick={() => setShowChat(!showChat)}
-            className="lg:hidden flex items-center gap-1.5 text-surface-500 hover:text-primary-700 transition text-sm"
-          >
-            <FiMessageCircle /> Chat
-          </button>
+          <h1 className="text-sm font-medium text-surface-700 truncate max-w-[40%]">{session.video_title}</h1>
+          <div className="flex items-center gap-3">
+            <Link
+              to={`/session/${session.id}/materials`}
+              className="text-xs font-semibold text-primary-700 hover:text-primary-600"
+            >
+              Materials
+            </Link>
+            <button
+              onClick={() => setShowChat(!showChat)}
+              className="lg:hidden flex items-center gap-1.5 text-surface-500 hover:text-primary-700 transition text-sm"
+            >
+              <FiMessageCircle /> Chat
+            </button>
+          </div>
         </div>
       </div>
 
@@ -152,6 +229,7 @@ export default function SessionPage() {
               currentTime={currentTime}
               duration={duration}
               checkpoints={checkpoints}
+              onSeekToCheckpoint={handleSeekToCheckpoint}
             />
 
             {/* Video Info */}
@@ -165,6 +243,19 @@ export default function SessionPage() {
                 </span>
               </div>
             </div>
+
+            <StudyMaterialsPanel
+              sessionId={session.id}
+              generatedStudyMaterials={generatedStudyMaterials}
+              generatingStudyMaterial={generatingStudyMaterial}
+              onGenerateStudyMaterial={handleGenerateStudyMaterial}
+            />
+
+            <SessionRecapPanel
+              recap={sessionRecap}
+              generating={generatingRecap}
+              onGenerate={handleGenerateRecap}
+            />
 
             {/* Summary (shown after all checkpoints answered) */}
             {showSummary && (

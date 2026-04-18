@@ -1,4 +1,4 @@
-export default function ProgressBar({ currentTime, duration, checkpoints }) {
+export default function ProgressBar({ currentTime, duration, checkpoints, onSeekToCheckpoint }) {
   if (!duration) return null;
 
   const progress = (currentTime / duration) * 100;
@@ -22,10 +22,12 @@ export default function ProgressBar({ currentTime, duration, checkpoints }) {
         }
 
         return (
-          <div
+          <button
             key={cp.id}
+            type="button"
             className={`absolute top-1/2 -translate-y-1/2 w-3 h-3 ${color} rounded-full border-2 border-white shadow-sm transition-all group-hover:scale-125`}
             style={{ left: `${pos}%`, transform: `translateX(-50%) translateY(-50%)` }}
+            onClick={() => onSeekToCheckpoint && onSeekToCheckpoint(cp)}
             title={`Checkpoint @ ${Math.floor(cp.timestamp_seconds / 60)}:${(cp.timestamp_seconds % 60).toString().padStart(2, '0')}`}
           />
         );

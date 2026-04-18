@@ -12,6 +12,10 @@ class User(db.Model):
     name = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     sessions = db.relationship("Session", backref="user", lazy=True, cascade="all, delete-orphan")
+    learning_profile = db.relationship("LearningProfile", backref="user", uselist=False,
+                                       lazy=True, cascade="all, delete-orphan")
+    context_prompt = db.relationship("UserContextPrompt", backref="user", uselist=False,
+                                     lazy=True, cascade="all, delete-orphan")
 
     def to_dict(self):
         return {
@@ -35,6 +39,10 @@ class Session(db.Model):
                                   order_by="Checkpoint.timestamp_seconds")
     chat_messages = db.relationship("ChatMessage", backref="session", lazy=True, cascade="all, delete-orphan",
                                     order_by="ChatMessage.created_at")
+    study_materials = db.relationship("StudyMaterial", backref="session", lazy=True, cascade="all, delete-orphan",
+                                      order_by="StudyMaterial.created_at.desc()")
+    recap = db.relationship("SessionRecap", backref="session", uselist=False,
+                            lazy=True, cascade="all, delete-orphan")
 
     def to_dict(self, include_transcript=False, include_checkpoints=True, include_chat=False):
         data = {
@@ -104,4 +112,88 @@ class ChatMessage(db.Model):
             "role": self.role,
             "content": self.content,
             "created_at": self.created_at.isoformat(),
+        }
+
+
+class StudyMaterial(db.Model):
+    __tablename__ = "study_materials"
+    id = db.Column(db.Integer, primary_key=True)
+    session_id = db.Column(db.Integer, db.ForeignKey("sessions.id"), nullable=False)
+    material_type = db.Column(db.String(50), nullable=False)
+    title = db.Column(db.String(255), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "session_id": self.session_id,
+            "material_type": self.material_type,
+            "title": self.title,
+            "content": self.content,
+            "created_at": self.created_at.isoformat(),
+        }
+
+
+class LearningProfile(db.Model):
+    __tablename__ = "learning_profiles"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, unique=True)
+    goal = db.Column(db.String(255), default="")
+    preferred_style = db.Column(db.String(100), default="")
+    weak_topics = db.Column(db.Text, default="[]")
+    strengths = db.Column(db.Text, default="[]")
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "goal": self.goal or "",
+            "preferred_style": self.preferred_style or "",
+            "weak_topics": self.weak_topics or "[]",
+            "strengths": self.strengths or "[]",
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
+
+
+class SessionRecap(db.Model):
+    __tablename__ = "session_recaps"
+    id = db.Column(db.Integer, primary_key=True)
+    session_id = db.Column(db.Integer, db.ForeignKey("sessions.id"), nullable=False, unique=True)
+    title = db.Column(db.String(255), default="Session Recap")
+    summary = db.Column(db.Text, nullable=False)
+    weak_topics = db.Column(db.Text, default="[]")
+    strengths = db.Column(db.Text, default="[]")
+    next_actions = db.Column(db.Text, default="[]")
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "session_id": self.session_id,
+            "title": self.title,
+            "summary": self.summary,
+            "weak_topics": self.weak_topics or "[]",
+            "strengths": self.strengths or "[]",
+            "next_actions": self.next_actions or "[]",
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
+
+
+class UserContextPrompt(db.Model):
+    __tablename__ = "user_context_prompts"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, unique=True)
+    prompt_text = db.Column(db.Text, default="")
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "prompt_text": self.prompt_text or "",
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
         }

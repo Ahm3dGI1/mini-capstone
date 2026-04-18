@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { updateProfile, deleteAccount } from '../api/api';
+import { updateProfile, deleteAccount, getLearningContext, updateLearningContext } from '../api/api';
 import { FiUser, FiMail, FiLock, FiTrash2, FiSave } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import { useEffect } from 'react';
 
 export default function ProfilePage() {
   const { user, setUser, logout } = useAuth();
@@ -12,7 +13,21 @@ export default function ProfilePage() {
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [password, setPassword] = useState('');
+  const [contextPrompt, setContextPrompt] = useState('');
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    const loadLearningContext = async () => {
+      try {
+        const res = await getLearningContext();
+        setContextPrompt(res.data.context?.prompt_text || '');
+      } catch {
+        // keep defaults if context is not available yet
+      }
+    };
+
+    loadLearningContext();
+  }, []);
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -21,6 +36,7 @@ export default function ProfilePage() {
       const data = { name, email };
       if (password) data.password = password;
       const res = await updateProfile(data);
+      await updateLearningContext(contextPrompt);
       setUser(res.data.user);
       setPassword('');
       toast.success('Profile updated!');
@@ -87,6 +103,21 @@ export default function ProfilePage() {
             placeholder="Leave blank to keep current"
             minLength={6}
           />
+        </div>
+
+        <div id="learning-context" className="pt-2 border-t border-surface-100">
+          <h2 className="text-sm font-semibold text-surface-800 mb-3">Learning Context</h2>
+          <label className="block text-sm font-medium text-surface-700 mb-1.5">Personal Context Prompt</label>
+          <textarea
+            value={contextPrompt}
+            onChange={(e) => setContextPrompt(e.target.value)}
+            rows={8}
+            className="w-full px-4 py-3 border border-surface-200 rounded-lg bg-surface-50 focus:bg-white focus:ring-2 focus:ring-primary-200 focus:border-primary-400 text-sm transition leading-relaxed"
+            placeholder={"Example:\nI am preparing for software engineering interviews.\nI prefer concise explanations first, then one concrete example.\nI struggle with dynamic programming and memory complexity.\nWhen possible, connect ideas to backend/API design."}
+          />
+          <p className="text-xs text-surface-500 mt-2">
+            This text is injected as your long-term learning context for tutor chat and recap generation.
+          </p>
         </div>
 
         <button

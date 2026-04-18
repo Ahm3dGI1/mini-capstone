@@ -31,6 +31,11 @@ export const loginUser = (data) => api.post('/auth/login', data);
 export const getMe = () => api.get('/auth/me');
 export const updateProfile = (data) => api.put('/auth/profile', data);
 export const deleteAccount = () => api.delete('/auth/delete');
+export const getLearningProfile = () => api.get('/learning-profile');
+export const updateLearningProfile = (data) => api.put('/learning-profile', data);
+export const getLearningContext = () => api.get('/learning-context');
+export const updateLearningContext = (promptText) =>
+  api.put('/learning-context', { prompt_text: promptText });
 
 // ── Sessions ──
 export const createSession = (youtubeUrl) => api.post('/sessions', { youtube_url: youtubeUrl });
@@ -45,5 +50,14 @@ export const answerCheckpoint = (sessionId, checkpointId, answer) =>
 // ── Chat ──
 export const sendChatMessage = (sessionId, message, currentTime) =>
   api.post(`/sessions/${sessionId}/chat`, { message, current_time: currentTime });
+
+// ── Study Materials ──
+export const generateStudyMaterial = (sessionId, materialTypes) =>
+  api.post(`/sessions/${sessionId}/study-materials`, { material_types: materialTypes });
+export const listStudyMaterials = (sessionId) => api.get(`/sessions/${sessionId}/study-materials`);
+export const getStudyMaterial = (sessionId, materialId) =>
+  api.get(`/sessions/${sessionId}/study-materials/${materialId}`);
+export const getSessionRecap = (sessionId) => api.get(`/sessions/${sessionId}/recap`);
+export const generateSessionRecap = (sessionId) => api.post(`/sessions/${sessionId}/recap`);
 
 export default api;

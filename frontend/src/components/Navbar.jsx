@@ -1,15 +1,31 @@
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FiBookOpen, FiLogOut, FiUser, FiGrid } from 'react-icons/fi';
+import { FiBookOpen, FiLogOut, FiUser, FiGrid, FiChevronDown, FiTarget } from 'react-icons/fi';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
 
   const handleLogout = () => {
     logout();
     navigate('/');
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <nav className="bg-navy-900 sticky top-0 z-50 shadow-lg shadow-navy-950/20">
@@ -28,12 +44,46 @@ export default function Navbar() {
                 <Link to="/dashboard" className="flex items-center gap-1.5 text-stone-300 hover:text-primary-400 hover:bg-white/5 transition px-3 py-2 rounded-lg text-sm font-medium">
                   <FiGrid className="text-base" /> Dashboard
                 </Link>
-                <Link to="/profile" className="flex items-center gap-1.5 text-stone-300 hover:text-primary-400 hover:bg-white/5 transition px-3 py-2 rounded-lg text-sm font-medium">
-                  <FiUser className="text-base" /> {user.name}
-                </Link>
-                <button onClick={handleLogout} className="flex items-center gap-1.5 text-stone-400 hover:text-red-400 hover:bg-white/5 transition px-3 py-2 rounded-lg text-sm font-medium ml-1">
-                  <FiLogOut className="text-base" />
-                </button>
+
+                <div className="relative" ref={menuRef}>
+                  <button
+                    type="button"
+                    onClick={() => setMenuOpen((prev) => !prev)}
+                    className="flex items-center gap-1.5 text-stone-300 hover:text-primary-400 hover:bg-white/5 transition px-3 py-2 rounded-lg text-sm font-medium"
+                  >
+                    <FiUser className="text-base" /> {user.name}
+                    <FiChevronDown className={`text-xs transition ${menuOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {menuOpen && (
+                    <div className="absolute right-0 mt-2 w-52 bg-navy-800 border border-white/10 rounded-lg shadow-xl overflow-hidden z-50">
+                      <Link
+                        to="/profile"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2.5 text-sm text-stone-200 hover:bg-white/5"
+                      >
+                        <FiUser className="text-sm" /> Profile Settings
+                      </Link>
+                      <Link
+                        to="/profile#learning-context"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2.5 text-sm text-stone-200 hover:bg-white/5"
+                      >
+                        <FiTarget className="text-sm" /> Learning Context
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMenuOpen(false);
+                          handleLogout();
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-red-300 hover:bg-white/5"
+                      >
+                        <FiLogOut className="text-sm" /> Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
               </>
             ) : (
               <>

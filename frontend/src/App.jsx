@@ -7,6 +7,8 @@ import Register from './pages/Register';
 import DashboardPage from './pages/DashboardPage';
 import SessionPage from './pages/SessionPage';
 import ProfilePage from './pages/ProfilePage';
+import StudyMaterialsPage from './pages/StudyMaterialsPage';
+import StudyMaterialDetailPage from './pages/StudyMaterialDetailPage';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -31,6 +33,8 @@ export default function App() {
           <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
           <Route path="/session/:id" element={<ProtectedRoute><SessionPage /></ProtectedRoute>} />
+          <Route path="/session/:id/materials" element={<ProtectedRoute><StudyMaterialsPage /></ProtectedRoute>} />
+          <Route path="/session/:id/materials/:materialId" element={<ProtectedRoute><StudyMaterialDetailPage /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

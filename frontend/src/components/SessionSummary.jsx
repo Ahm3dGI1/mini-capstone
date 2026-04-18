@@ -1,6 +1,9 @@
 import { FiCheck, FiX, FiAward, FiMessageCircle } from 'react-icons/fi';
 
-export default function SessionSummary({ checkpoints, onAskTutor }) {
+export default function SessionSummary({
+  checkpoints,
+  onAskTutor,
+}) {
   const answered = checkpoints.filter((c) => c.user_answer !== null);
   const correct = answered.filter((c) => c.user_answer === c.correct_option);
   const incorrect = answered.filter((c) => c.user_answer !== c.correct_option);
@@ -50,7 +53,6 @@ export default function SessionSummary({ checkpoints, onAskTutor }) {
         )}
       </div>
 
-      {/* Actions */}
       {onAskTutor && (
         <button
           onClick={onAskTutor}
